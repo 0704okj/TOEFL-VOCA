@@ -1,0 +1,701 @@
+<!doctype html>
+
+<html lang="ko">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>TOEFL Biology Vocab Matching</title>
+
+  <style>
+
+    :root { --gap: 10px; --radius: 14px; }
+
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#f6f7fb; color:#111; }
+
+    header { padding: 18px 16px 8px; max-width: 1100px; margin: 0 auto; }
+
+    h1 { margin: 0 0 8px; font-size: 18px; }
+
+    .sub { display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size: 13px; color:#333; }
+
+    .pill { background:#fff; border:1px solid #e7e7ef; border-radius:999px; padding:8px 10px; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px 18px; }
+
+    .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin: 10px 0 14px; }
+
+    button {
+
+      border: 1px solid #dcdcec; background:#fff; padding:10px 12px;
+
+      border-radius: 12px; cursor:pointer; font-weight:600;
+
+      box-shadow: 0 1px 0 rgba(0,0,0,.03);
+
+    }
+
+    button:hover { filter: brightness(.98); }
+
+    button:active { transform: translateY(1px); }
+
+    .grid { display:grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+
+    @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+
+    .col {
+
+      background:#fff; border:1px solid #e7e7ef; border-radius: var(--radius);
+
+      padding: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.04);
+
+    }
+
+    .col h2 { margin: 2px 0 10px; font-size: 14px; color:#222; }
+
+    .list { display:grid; grid-template-columns: 1fr; gap: 8px; }
+
+    .card {
+
+      border:1px solid #ececf5; border-radius: 12px; padding: 10px 12px;
+
+      background:#fafbff; cursor:pointer; user-select:none;
+
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+
+    }
+
+    .card small { color:#666; font-weight:600; }
+
+    .card.selected { outline: 2px solid #4c7dff; background:#eef3ff; }
+
+    .card.matched { background:#ecfff1; border-color:#bfe7c8; color:#0b5b22; cursor:default; opacity:.95; }
+
+    .card.wrong { animation: shake .25s linear 0s 1; outline: 2px solid #ff4c4c; background:#ffecec; }
+
+    @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-3px)} 50%{transform:translateX(3px)} 75%{transform:translateX(-2px)} 100%{transform:translateX(0)} }
+
+    .footer { margin-top: 12px; font-size: 12px; color:#555; }
+
+    .progress { height: 10px; background:#eef0f7; border-radius:999px; overflow:hidden; border:1px solid #e6e7f1; }
+
+    .bar { height:100%; width:0%; background: linear-gradient(90deg,#4c7dff,#8a5bff); transition: width .2s ease; }
+
+    .note { font-size: 12px; color:#666; margin-top: 6px; line-height: 1.4; }
+
+    code { background:#f0f1f7; padding:2px 6px; border-radius:8px; }
+
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+
+    <h1>TOEFL Biology Vocab Matching Game</h1>
+
+    <div class="sub">
+
+      <div class="pill">규칙: <b>왼쪽</b> 하나 클릭 → <b>오른쪽</b> 하나 클릭해서 매칭</div>
+
+      <div class="pill">총 <b id="totalCount"></b>개</div>
+
+      <div class="pill">맞춘 개수: <b id="matchedCount">0</b></div>
+
+      <div class="pill">시도: <b id="tries">0</b></div>
+
+      <div class="pill">시간: <b id="time">00:00</b></div>
+
+    </div>
+
+  </header>
+
+
+
+  <div class="wrap">
+
+    <div class="controls">
+
+      <button id="resetBtn">리셋(다시 섞기)</button>
+
+      <button id="revealOneBtn">힌트 1개(정답 1쌍 자동 매칭)</button>
+
+      <button id="toggleModeBtn">모드 전환(한국어→영어)</button>
+
+    </div>
+
+
+
+    <div class="progress" aria-label="progress">
+
+      <div class="bar" id="bar"></div>
+
+    </div>
+
+    <div class="note">
+
+      * 수정은 코드 아래쪽 <code>pairs</code> 배열만 바꾸면 됩니다.
+
+    </div>
+
+
+
+    <div class="grid" style="margin-top: 12px;">
+
+      <section class="col">
+
+        <h2 id="leftTitle">English</h2>
+
+        <div class="list" id="leftList"></div>
+
+      </section>
+
+      <section class="col">
+
+        <h2 id="rightTitle">한국어</h2>
+
+        <div class="list" id="rightList"></div>
+
+      </section>
+
+    </div>
+
+
+
+    <div class="footer">
+
+      파일로 저장 후 브라우저에서 열면 바로 실행됩니다. (예: <code>match_bio.html</code>)
+
+    </div>
+
+  </div>
+
+
+
+<script>
+
+  // ====== 단어 목록 (60쌍) ======
+
+  const pairs = [
+
+    ["adaptation", "적응"],
+
+    ["natural selection", "자연선택"],
+
+    ["speciation", "종 분화"],
+
+    ["mutation", "돌연변이"],
+
+    ["relict", "잔존 생물(살아 있는 화석)"],
+
+    ["superorganism", "초개체(생물의 군집)"],
+
+    ["colonization", "군집 형성(정착)"],
+
+    ["community", "군집"],
+
+    ["symbiosis", "공생"],
+
+    ["parasitism", "기생"],
+
+    ["parasite", "기생 생물(기생충)"],
+
+    ["commensalism", "편리공생"],
+
+    ["mutualism", "상리공생"],
+
+    ["epiphyte", "착생 식물"],
+
+    ["niche", "적소(생태적 지위)"],
+
+    ["flora", "식물군"],
+
+    ["fauna", "동물군"],
+
+    ["biomass", "생물량"],
+
+    ["food web", "먹이 그물"],
+
+    ["biological clock", "생체 시계"],
+
+    ["circadian", "일주(24시간) 주기의"],
+
+    ["cell division", "세포 분열"],
+
+    ["reproduction", "생식/번식"],
+
+    ["offspring", "새끼/자손"],
+
+    ["dormancy", "휴면(비활동 상태)"],
+
+    ["organism", "유기체/생물"],
+
+    ["microorganism", "미생물"],
+
+    ["fungus", "곰팡이류"],
+
+    ["bacteria", "박테리아/세균"],
+
+    ["paleontology", "고생물학"],
+
+
+
+    ["mammal", "포유동물"],
+
+    ["cetacean", "고래목 동물(고래류)"],
+
+    ["ruminant", "반추동물"],
+
+    ["tusk", "엄니"],
+
+    ["avian", "조류의"],
+
+    ["plumage", "(새의) 깃털"],
+
+    ["reptile", "파충류"],
+
+    ["venom", "(뱀 등의) 독"],
+
+    ["amphibian", "양서류"],
+
+    ["gill", "(물고기의) 아가미"],
+
+    ["fin", "(물고기의) 지느러미"],
+
+    ["rodent", "설치류"],
+
+    ["invertebrate", "무척추동물"],
+
+    ["arthropod", "절지동물"],
+
+    ["mollusk", "연체동물"],
+
+    ["bivalve", "쌍각류(조개류)"],
+
+    ["mate", "(새·동물의) 짝"],
+
+    ["courtship", "(짝짓기를 위한) 구애"],
+
+    ["breed", "새끼를 낳다/사육하다/품종"],
+
+    ["fertilization", "수정"],
+
+    ["hatchling", "갓 부화한 새끼"],
+
+    ["feeding habit", "먹이섭취 습성"],
+
+    ["scavenger", "청소동물(죽은 동물 먹는)"],
+
+    ["prey", "먹이/사냥감"],
+
+    ["bottom feeder", "바닥에서 먹이 찾는 물고기"],
+
+    ["endotherm", "온혈동물"],
+
+    ["hibernation", "(동물의) 겨울잠"],
+
+    ["migration", "(동물·철새의) 이주/이동"],
+
+    ["vocalization", "(동물의) 발성/소리"],
+
+    ["echolocation", "반향정위"]
+
+  ];
+
+
+
+  const $ = (id) => document.getElementById(id);
+
+
+
+  const shuffle = (arr) => {
+
+    const a = arr.slice();
+
+    for (let i = a.length - 1; i > 0; i--) {
+
+      const j = Math.floor(Math.random() * (i + 1));
+
+      [a[i], a[j]] = [a[j], a[i]];
+
+    }
+
+    return a;
+
+  };
+
+
+
+  function escapeHtml(s) {
+
+    return String(s)
+
+      .replaceAll("&", "&amp;")
+
+      .replaceAll("<", "&lt;")
+
+      .replaceAll(">", "&gt;")
+
+      .replaceAll('"', "&quot;")
+
+      .replaceAll("'", "&#039;");
+
+  }
+
+
+
+  // ====== 상태 ======
+
+  let mode = "EN_KO"; // EN_KO or KO_EN
+
+  let leftSelected = null;
+
+  let rightSelected = null;
+
+  let matched = new Set(); // english key
+
+  let tries = 0;
+
+
+
+  // timer
+
+  let startAt = null;
+
+  let timerId = null;
+
+
+
+  function formatTime(ms) {
+
+    const total = Math.floor(ms / 1000);
+
+    const m = String(Math.floor(total / 60)).padStart(2, "0");
+
+    const s = String(total % 60).padStart(2, "0");
+
+    return `${m}:${s}`;
+
+  }
+
+
+
+  function startTimerIfNeeded() {
+
+    if (timerId) return;
+
+    startAt = Date.now();
+
+    timerId = setInterval(() => {
+
+      $("time").textContent = formatTime(Date.now() - startAt);
+
+    }, 250);
+
+  }
+
+
+
+  function stopTimerIfDone() {
+
+    if (matched.size === pairs.length && timerId) {
+
+      clearInterval(timerId);
+
+      timerId = null;
+
+    }
+
+  }
+
+
+
+  function getLists() {
+
+    if (mode === "EN_KO") {
+
+      return {
+
+        leftTitle: "English",
+
+        rightTitle: "한국어",
+
+        left: pairs.map(p => ({ id: p[0], text: p[0] })),
+
+        right: pairs.map(p => ({ id: p[0], text: p[1] }))
+
+      };
+
+    }
+
+    return {
+
+      leftTitle: "한국어",
+
+      rightTitle: "English",
+
+      left: pairs.map(p => ({ id: p[0], text: p[1] })),
+
+      right: pairs.map(p => ({ id: p[0], text: p[0] }))
+
+    };
+
+  }
+
+
+
+  function updateHUD() {
+
+    $("totalCount").textContent = String(pairs.length);
+
+    $("matchedCount").textContent = String(matched.size);
+
+    $("tries").textContent = String(tries);
+
+    $("bar").style.width = `${(matched.size / pairs.length) * 100}%`;
+
+  }
+
+
+
+  function makeCard(item, side) {
+
+    const div = document.createElement("div");
+
+    div.className = "card";
+
+    div.dataset.side = side;
+
+    div.dataset.id = item.id; // english key
+
+
+
+    div.innerHTML = `<span>${escapeHtml(item.text)}</span><small>${side === "left" ? "" : ""}</small>`;
+
+
+
+    if (matched.has(item.id)) div.classList.add("matched");
+
+
+
+    div.addEventListener("click", () => onPick(div));
+
+    return div;
+
+  }
+
+
+
+  function render() {
+
+    const { leftTitle, rightTitle, left, right } = getLists();
+
+    $("leftTitle").textContent = leftTitle;
+
+    $("rightTitle").textContent = rightTitle;
+
+
+
+    const leftList = $("leftList");
+
+    const rightList = $("rightList");
+
+    leftList.innerHTML = "";
+
+    rightList.innerHTML = "";
+
+
+
+    leftSelected = null;
+
+    rightSelected = null;
+
+
+
+    for (const item of shuffle(left)) leftList.appendChild(makeCard(item, "left"));
+
+    for (const item of shuffle(right)) rightList.appendChild(makeCard(item, "right"));
+
+
+
+    updateHUD();
+
+  }
+
+
+
+  function markMatched(id) {
+
+    document.querySelectorAll(`.card[data-id="${CSS.escape(id)}"]`).forEach(el => {
+
+      el.classList.remove("selected");
+
+      el.classList.add("matched");
+
+    });
+
+  }
+
+
+
+  function onPick(el) {
+
+    const side = el.dataset.side;
+
+    const id = el.dataset.id;
+
+
+
+    if (matched.has(id)) return;
+
+
+
+    startTimerIfNeeded();
+
+
+
+    if (side === "left") {
+
+      if (leftSelected) leftSelected.classList.remove("selected");
+
+      leftSelected = el;
+
+      el.classList.add("selected");
+
+    } else {
+
+      if (rightSelected) rightSelected.classList.remove("selected");
+
+      rightSelected = el;
+
+      el.classList.add("selected");
+
+    }
+
+
+
+    if (leftSelected && rightSelected) {
+
+      tries += 1;
+
+
+
+      const leftId = leftSelected.dataset.id;
+
+      const rightId = rightSelected.dataset.id;
+
+
+
+      if (leftId === rightId) {
+
+        matched.add(leftId);
+
+        markMatched(leftId);
+
+        leftSelected = null;
+
+        rightSelected = null;
+
+        updateHUD();
+
+        stopTimerIfDone();
+
+      } else {
+
+        leftSelected.classList.add("wrong");
+
+        rightSelected.classList.add("wrong");
+
+        setTimeout(() => {
+
+          leftSelected?.classList.remove("wrong", "selected");
+
+          rightSelected?.classList.remove("wrong", "selected");
+
+          leftSelected = null;
+
+          rightSelected = null;
+
+        }, 260);
+
+        updateHUD();
+
+      }
+
+    }
+
+  }
+
+
+
+  function revealOne() {
+
+    const remaining = pairs.map(p => p[0]).filter(id => !matched.has(id));
+
+    if (remaining.length === 0) return;
+
+    startTimerIfNeeded();
+
+    const id = remaining[Math.floor(Math.random() * remaining.length)];
+
+    tries += 1;
+
+    matched.add(id);
+
+    markMatched(id);
+
+    updateHUD();
+
+    stopTimerIfDone();
+
+  }
+
+
+
+  function resetAll() {
+
+    matched = new Set();
+
+    tries = 0;
+
+    $("time").textContent = "00:00";
+
+    if (timerId) { clearInterval(timerId); timerId = null; }
+
+    startAt = null;
+
+    render();
+
+  }
+
+
+
+  function toggleMode() {
+
+    mode = (mode === "EN_KO") ? "KO_EN" : "EN_KO";
+
+    render();
+
+  }
+
+
+
+  $("resetBtn").addEventListener("click", resetAll);
+
+  $("revealOneBtn").addEventListener("click", revealOne);
+
+  $("toggleModeBtn").addEventListener("click", toggleMode);
+
+
+
+  render();
+
+</script>
+
+</body>
+
+</html>
