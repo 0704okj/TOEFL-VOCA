@@ -11,21 +11,32 @@
     p{margin:0 0 16px;color:#444;line-height:1.5}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
     a.card{display:block;text-decoration:none;color:inherit;background:#fff;border:1px solid #e7e7ef;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
-    a.card:hover{filter:brightness(.985)}
+    a.card:hover{filter:brightness(.985); border-color: #4c7dff;}
     .title{font-weight:800;margin-bottom:6px}
     .desc{font-size:13px;color:#555;line-height:1.4}
-    code{background:#f0f1f7;padding:2px 6px;border-radius:8px}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>TOEFL Vocab Matching Games</h1>
-    <p>게임을 선택하세요. 새 게임은 <code>폴더/index.html</code>로 추가하면 됩니다. (예: <code>geo/index.html</code>)</p>
+    <p>학습할 단어장을 선택하세요.</p>
 
     <div class="grid">
-      <a class="card" href="./bio/">
-        <div class="title">Biology Vocab (생물 단어)</div>
-        <div class="desc">영어 ↔ 한국어 매칭 게임</div>
+      <a class="card" href="./bio1/">
+        <div class="title">Biology 1 (일반)</div>
+        <div class="desc">적응, 공생, 생태계 등 기초 단어</div>
+      </a>
+      <a class="card" href="./bio2/">
+        <div class="title">Biology 2 (동물)</div>
+        <div class="desc">포유류, 조류, 파충류 등 동물 관련</div>
+      </a>
+      <a class="card" href="./bio3/">
+        <div class="title">Biology 3 (식물)</div>
+        <div class="desc">식물학, 광합성, 초목 등 식물 관련</div>
+      </a>
+      <a class="card" href="./bio4/">
+        <div class="title">Biology 4 (곤충)</div>
+        <div class="desc">변태, 애벌레, 보호색 등 곤충 관련</div>
       </a>
     </div>
   </div>
