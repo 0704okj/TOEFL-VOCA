@@ -12,8 +12,7 @@
     .sub { display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size: 13px; color:#333; }
     .pill { background:#fff; border:1px solid #e7e7ef; border-radius:999px; padding:8px 10px; box-shadow: 0 1px 0 rgba(0,0,0,.03); }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 0 16px 18px; }
-    
-    /* 상단 컨트롤 버튼 */
+
     .controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin: 10px 0 14px; }
     button {
       border: 1px solid #dcdcec; background:#fff; padding:10px 12px;
@@ -24,11 +23,9 @@
     button:active { transform: translateY(1px); }
     button:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* 진행 바 */
     .progress { height: 10px; background:#eef0f7; border-radius:999px; overflow:hidden; border:1px solid #e6e7f1; margin-bottom: 12px; }
     .bar { height:100%; width:0%; background: linear-gradient(90deg,#4c7dff,#8a5bff); transition: width .2s ease; }
 
-    /* 메인 그리드 */
     .grid { display:grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
     @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
     .col {
@@ -38,7 +35,6 @@
     .col h2 { margin: 2px 0 10px; font-size: 14px; color:#222; }
     .list { display:grid; grid-template-columns: 1fr; gap: 8px; min-height: 440px; }
 
-    /* 카드 디자인 */
     .card {
       border:1px solid #ececf5; border-radius: 12px; padding: 10px 12px;
       background:#fafbff; cursor:pointer; user-select:none;
@@ -49,12 +45,8 @@
     .card.wrong { animation: shake .25s linear 0s 1; outline: 2px solid #ff4c4c; background:#ffecec; }
     @keyframes shake { 0%{transform:translateX(0)} 25%{transform:translateX(-3px)} 50%{transform:translateX(3px)} 75%{transform:translateX(-2px)} 100%{transform:translateX(0)} }
 
-    /* 페이지네이션 */
     .pagination { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px; padding: 10px; }
     .page-info { font-weight: 600; font-size: 14px; }
-    
-    .nav-links { margin-top: 20px; }
-    .nav-links a { color: #4c7dff; text-decoration: none; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -63,7 +55,7 @@
     <h1>TOEFL Biology Vocab Matching</h1>
     <div class="sub">
       <div class="pill">규칙: <b>왼쪽</b> 하나 클릭 → <b>오른쪽</b> 하나 클릭</div>
-      <div class="pill">진행도: <b id="matchedCount">0</b> / <b id="totalCount">120</b></div>
+      <div class="pill">진행도: <b id="matchedCount">0</b> / <b id="totalCount">0</b></div>
       <div class="pill">시도: <b id="tries">0</b></div>
       <div class="pill">시간: <b id="time">00:00</b></div>
     </div>
@@ -91,25 +83,56 @@
 
     <div class="pagination">
       <button id="prevBtn">이전</button>
-      <span class="page-info">Page <span id="currentPageNum">1</span> / <span id="totalPageNum">12</span></span>
+      <span class="page-info">Page <span id="currentPageNum">1</span> / <span id="totalPageNum">1</span></span>
       <button id="nextBtn">다음</button>
     </div>
   </div>
 
 <script>
   const allPairs = [
-  ["adaptation", "적응"], ["natural selection", "자연 선택"], ["speciation", "종 분화"], ["mutation", "돌연변이"], ["relict", "잔존 생물, 살아 있는 화석"], ["superorganism", "생물의 군집, 초개체"], ["colonization", "(동식물)의 군집 형성"], ["community", "군집"], ["symbiosis", "공생"], ["parasitism", "기생"], ["parasite", "기생충, 기생 생물"], ["commensalism", "편리공생"], ["mutualism", "상리공생"], ["epiphyte", "착생 식물"], ["niche", "(특정 생물이 살기에) 적합한 환경, 적소"], ["flora", "(특정 장소·시대·환경)의 식물군"], ["fauna", "(특정 장소·시대·환경)의 동물군"], ["biomass", "(특정 지역 내의) 생물량"], ["food web", "먹이 그물"], ["biological clock", "생체 시계"], ["circadian", "(24시간을 주기로 변하는 생물체의) 생물학적 주기"], ["cell division", "세포 분열"], ["reproduction", "생식, 번식"], ["offspring", "새끼, 자손"], ["dormancy", "휴면(상태), 비활동 상태"], ["organism", "유기체, 생물"], ["microorganism", "미생물"], ["fungus", "곰팡이류"], ["bacteria", "박테리아, 세균"], ["paleontology", "고생물학"]
+    ["adaptation", "적응"],
+    ["natural selection", "자연 선택"],
+    ["speciation", "종 분화"],
+    ["mutation", "돌연변이"],
+    ["relict", "잔존 생물, 살아 있는 화석"],
+    ["superorganism", "생물의 군집, 초개체"],
+    ["colonization", "(동식물)의 군집 형성"],
+    ["community", "군집"],
+    ["symbiosis", "공생"],
+    ["parasitism", "기생"],
+    ["parasite", "기생충, 기생 생물"],
+    ["commensalism", "편리공생"],
+    ["mutualism", "상리공생"],
+    ["epiphyte", "착생 식물"],
+    ["niche", "(특정 생물이 살기에) 적합한 환경, 적소"],
+    ["flora", "(특정 장소·시대·환경)의 식물군"],
+    ["fauna", "(특정 장소·시대·환경)의 동물군"],
+    ["biomass", "(특정 지역 내의) 생물량"],
+    ["food web", "먹이 그물"],
+    ["biological clock", "생체 시계"],
+    ["circadian", "(24시간을 주기로 변하는 생물체의) 생물학적 주기"],
+    ["cell division", "세포 분열"],
+    ["reproduction", "생식, 번식"],
+    ["offspring", "새끼, 자손"],
+    ["dormancy", "휴면(상태), 비활동 상태"],
+    ["organism", "유기체, 생물"],
+    ["microorganism", "미생물"],
+    ["fungus", "곰팡이류"],
+    ["bacteria", "박테리아, 세균"],
+    ["paleontology", "고생물학"]
   ];
 
   const $ = (id) => document.getElementById(id);
 
-  let mode = "EN_KO"; 
+  let mode = "EN_KO";
   let currentPage = 0;
   const itemsPerPage = 10;
-  let matched = new Set(); 
+
+  let matched = new Set();
   let tries = 0;
   let leftSelected = null;
   let rightSelected = null;
+
   let startAt = null;
   let timerId = null;
 
@@ -134,7 +157,7 @@
     $("matchedCount").textContent = String(matched.size);
     $("tries").textContent = String(tries);
     $("bar").style.width = `${(matched.size / allPairs.length) * 100}%`;
-    
+
     const totalPages = Math.ceil(allPairs.length / itemsPerPage);
     $("currentPageNum").textContent = currentPage + 1;
     $("totalPageNum").textContent = totalPages;
@@ -146,8 +169,13 @@
     const startIdx = currentPage * itemsPerPage;
     const currentPairs = allPairs.slice(startIdx, startIdx + itemsPerPage);
 
-    let leftItems = mode === "EN_KO" ? currentPairs.map(p => ({ id: p[0], text: p[0] })) : currentPairs.map(p => ({ id: p[0], text: p[1] }));
-    let rightItems = mode === "EN_KO" ? currentPairs.map(p => ({ id: p[0], text: p[1] })) : currentPairs.map(p => ({ id: p[0], text: p[0] }));
+    const leftItems = mode === "EN_KO"
+      ? currentPairs.map(p => ({ id: p[0], text: p[0] }))
+      : currentPairs.map(p => ({ id: p[0], text: p[1] }));
+
+    const rightItems = mode === "EN_KO"
+      ? currentPairs.map(p => ({ id: p[0], text: p[1] }))
+      : currentPairs.map(p => ({ id: p[0], text: p[0] }));
 
     $("leftTitle").textContent = mode === "EN_KO" ? "English" : "한국어";
     $("rightTitle").textContent = mode === "EN_KO" ? "한국어" : "English";
@@ -169,11 +197,21 @@
   function makeCard(item, side) {
     const div = document.createElement("div");
     div.className = "card";
+    div.dataset.id = item.id;     // ✅ 텍스트가 아니라 id로 매칭
+    div.dataset.side = side;
+
     if (matched.has(item.id)) div.classList.add("matched");
     div.innerHTML = `<span>${item.text}</span>`;
+
     div.onclick = () => {
       if (matched.has(item.id)) return;
-      if (!timerId) { startAt = Date.now(); timerId = setInterval(() => { $("time").textContent = formatTime(Date.now() - startAt); }, 250); }
+
+      if (!timerId) {
+        startAt = Date.now();
+        timerId = setInterval(() => {
+          $("time").textContent = formatTime(Date.now() - startAt);
+        }, 250);
+      }
 
       if (side === "left") {
         if (leftSelected) leftSelected.classList.remove("selected");
@@ -186,38 +224,50 @@
 
       if (leftSelected && rightSelected) {
         tries++;
-        if (leftSelected.innerText === (mode === "EN_KO" ? item.id : allPairs.find(p=>p[0]===item.id)[1]) && 
-            rightSelected.innerText === (mode === "EN_KO" ? allPairs.find(p=>p[0]===item.id)[1] : item.id) || 
-            (allPairs.find(p=>p[0]===leftSelected.innerText || p[1]===leftSelected.innerText)[0] === allPairs.find(p=>p[0]===rightSelected.innerText || p[1]===rightSelected.innerText)[0])) {
-          
-          const matchId = allPairs.find(p=>p[0]===leftSelected.innerText || p[1]===leftSelected.innerText)[0];
+
+        const ok = leftSelected.dataset.id === rightSelected.dataset.id;
+
+        if (ok) {
+          const matchId = leftSelected.dataset.id;
           matched.add(matchId);
+
           document.querySelectorAll(".card").forEach(c => {
-             const txt = c.innerText;
-             const p = allPairs.find(pair => pair[0] === txt || pair[1] === txt);
-             if(p && p[0] === matchId) {
-               c.classList.remove("selected");
-               c.classList.add("matched");
-             }
+            if (c.dataset.id === matchId) {
+              c.classList.remove("selected");
+              c.classList.add("matched");
+            }
           });
-          leftSelected = null; rightSelected = null;
+
+          leftSelected = null;
+          rightSelected = null;
+
           updateHUD();
           if (matched.size === allPairs.length) clearInterval(timerId);
         } else {
           const l = leftSelected, r = rightSelected;
           l.classList.add("wrong"); r.classList.add("wrong");
-          setTimeout(() => { l.classList.remove("wrong", "selected"); r.classList.remove("wrong", "selected"); }, 300);
-          leftSelected = null; rightSelected = null;
+          setTimeout(() => {
+            l.classList.remove("wrong", "selected");
+            r.classList.remove("wrong", "selected");
+          }, 300);
+          leftSelected = null;
+          rightSelected = null;
+
+          updateHUD();
         }
       }
     };
+
     return div;
   }
 
-  $("resetBtn").onclick = () => { if(confirm("초기화할까요?")) location.reload(); };
+  $("resetBtn").onclick = () => { if (confirm("초기화할까요?")) location.reload(); };
   $("toggleModeBtn").onclick = () => { mode = mode === "EN_KO" ? "KO_EN" : "EN_KO"; render(); };
-  $("prevBtn").onclick = () => { if(currentPage > 0) { currentPage--; render(); } };
-  $("nextBtn").onclick = () => { if(currentPage < Math.ceil(allPairs.length/itemsPerPage)-1) { currentPage++; render(); } };
+  $("prevBtn").onclick = () => { if (currentPage > 0) { currentPage--; render(); } };
+  $("nextBtn").onclick = () => {
+    const totalPages = Math.ceil(allPairs.length / itemsPerPage);
+    if (currentPage < totalPages - 1) { currentPage++; render(); }
+  };
 
   render();
 </script>
